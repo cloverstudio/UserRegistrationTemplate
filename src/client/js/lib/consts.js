@@ -2,7 +2,7 @@
     "use strict;"
 
     var Consts = {
-        
+        credentialsMinLength: 6
     };
 
     // Exports ----------------------------------------------

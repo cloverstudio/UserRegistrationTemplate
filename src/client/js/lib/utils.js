@@ -16,6 +16,7 @@
     Utils.prototype.escapeHtml = escapeHtml;
     Utils.prototype.linkify = linkify;
     Utils.prototype.getURLQuery = getURLQuery;
+    Utils.prototype.l10n = localize;
     
     // Implementation ---------------------------------------
     function logging(obj) {
@@ -222,6 +223,12 @@
     
         return params;
 
+    }
+    
+    function localize(text){
+	    
+	    return text;
+	    
     }
 
 
