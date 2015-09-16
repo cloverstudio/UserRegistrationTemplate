@@ -34,7 +34,6 @@ var SignUpView = BaseView.extend({
 		$('#form-signup #btn-signup').unbind().on('click',function(){
 			
 			self.dismissAlerts();
-			
 			self.validate(function(err){
 				
 				self.resetValidationAlert();
@@ -59,14 +58,14 @@ var SignUpView = BaseView.extend({
 				if(!validationSuccess)
 					return;
 
-        		var name = $('#form-signup input[name="username"]').val();
+        		var username = $('#form-signup input[name="username"]').val();
         		var email = $('#form-signup input[name="email"]').val();
         		var password = $('#form-signup input[name="password"]').val();
         		var passwordConfirm = $('#form-signup input[name="password-confirm"]').val();
         
                 SignUpClient.send({
                     
-                    name:name,
+                    username:username,
                     email:email,
                     password:password,
                     passwordConfirm:passwordConfirm
@@ -80,6 +79,12 @@ var SignUpView = BaseView.extend({
                     }else{
                         // succeeeeeeeed!!!!!
                         self.showInfo(Utils.l10n("Succeed to signup. Please login now."));
+
+                        $('#form-signup input[name="username"]').val("");
+                        $('#form-signup input[name="email"]').val("");
+                        $('#form-signup input[name="password"]').val("");
+                        $('#form-signup input[name="password-confirm"]').val("");
+        		
                     }
                     
                     

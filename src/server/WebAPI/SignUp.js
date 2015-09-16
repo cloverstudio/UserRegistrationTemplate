@@ -4,6 +4,7 @@ var async = require('async');
 
 var RequestHandlerBase = require('./RequestHandlerBase');
 var init = require('../lib/init');
+var Utils = require('../lib/utils');
 var Const = require("../lib/consts");
 
 
@@ -16,10 +17,9 @@ SignUpHandler.prototype.attach = function(app,express){
         
     var self = this;
 
-    //Login data (requires body-parser)
     app.post(this.path('/signup'),function(request,response){
                 
-        var name = request.body.name;
+        var username = request.body.username;
         var email = request.body.email;
         var password = request.body.password;
         var passwordConfirm = request.body.passwordConfirm;
@@ -36,9 +36,10 @@ SignUpHandler.prototype.attach = function(app,express){
 
                 // save to database
                 var model = new userModel.model({
-                    name:name,
+                    username:username,
                     email: email,
-                    password: sha1(password)          
+                    password: sha1(password),
+                    created: Utils.now()          
                 });
                         
                 model.save(function(err,fileModel){
@@ -49,7 +50,7 @@ SignUpHandler.prototype.attach = function(app,express){
                     }
                     
                     self.successResponse(response,{
-                        ok: 'ok'
+                        ok: true
                     });   
                 
                 });
@@ -80,7 +81,7 @@ SignUpHandler.prototype.validate = function(requestBody,callBack){
 
         function (done) {
         
-        	userModel.model.findOne({ name: requestBody.name },function (err, user) {
+        	userModel.model.findOne({ username: requestBody.username },function (err, user) {
                 
                 if(!_.isNull(user)){
                     done("The user name is already taken.",null);

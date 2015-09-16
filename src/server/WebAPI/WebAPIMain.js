@@ -13,6 +13,8 @@ var WebAPIMain ={
         app.use(bodyParser.json());
         
         require('./SignUp').attach(app,express);
+        require('./SignIn').attach(app,express);
+        require('./ResetPassword').attach(app,express);
                 
     }
 }

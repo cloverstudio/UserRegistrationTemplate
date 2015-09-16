@@ -14,7 +14,7 @@ _.extend(UserModel.prototype,BaseModel.prototype);
 UserModel.prototype.init = function(mongoose){
     
     this.schema = new mongoose.Schema({
-        name: String,
+        username: String,
         email: String,
         password: String,
         created: Number

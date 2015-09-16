@@ -1,29 +1,38 @@
     
-    <form class="spika-form">
+    <form class="form" id="form-signin">
     
         <h2 class="form-signin-heading">{{l10n "Sign In"}}</h2>
+
+        <div class="alert alert-danger alert-dismissible" role="alert" style="display:none">
+          <strong>{{l10n "Error"}}</strong> 
+          <span class="detail"></span>
+        </div>
         
-        <div class="form-group">
+        <div class="alert alert-info alert-dismissible" role="alert" style="display:none">
+          <span class="detail"></span>
+        </div>
+        
+        <div class="form-group username">
             <div class="form-label">
                 <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span> {{l10n "User Name"}}
             </div>
-            <input type="text" id="input-username" class="form-control">
-            <div class="label-error"></div>
+            <input type="text" name="username" class="form-control">
+			<span class="help-block"></span>
         </div>
         
-        <div class="form-group">
+        <div class="form-group password">
             <div class="form-label">
                 <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span> {{l10n "Password"}}
             </div>
-            <input type="text" id="input-password" class="form-control">
-            <div class="label-error"></div>
+            <input type="password" name="password" class="form-control">
+			<span class="help-block"></span>
         </div>
         
         <div class="spacer">
     
         </div>
         
-        <div class="btn btn-lg btn-primary btn-block" id="btn-enter">{{l10n "Sign in"}}</div>
+        <div class="btn btn-lg btn-primary btn-block" id="btn-signin">{{l10n "Sign in"}}</div>
         
     </form>
     
