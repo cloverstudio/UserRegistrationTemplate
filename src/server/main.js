@@ -1,6 +1,6 @@
 var express = require('express');
 var http = require('http');
-var init = require('./init.js');
+var init = require('./lib/init.js');
 
 // initialization
 var app = express();

@@ -7,11 +7,12 @@ var Utils = require('../../../lib/utils');
 var Const = require('../../../lib/consts');
 var Config = require('../../../lib/init');
 
-var SignUpView = Backbone.View.extend({
+var BaseView = require('../BaseView');
+var SignUpClient = require('../../../lib/APIClients/SignUpClient');
 
-    container: null,
-    initialize: function(options) {
-        
+var SignUpView = BaseView.extend({
+
+    initialize: function(options) {        
         this.container = options.container;
         this.render();
     },
@@ -31,6 +32,8 @@ var SignUpView = Backbone.View.extend({
         var self = this;
 		
 		$('#form-signup #btn-signup').unbind().on('click',function(){
+			
+			self.dismissAlerts();
 			
 			self.validate(function(err){
 				
@@ -55,9 +58,29 @@ var SignUpView = Backbone.View.extend({
 				
 				if(!validationSuccess)
 					return;
-				
-				
-				
+
+        		var name = $('#form-signup input[name="username"]').val();
+        		var email = $('#form-signup input[name="email"]').val();
+        		var password = $('#form-signup input[name="password"]').val();
+        		var passwordConfirm = $('#form-signup input[name="password-confirm"]').val();
+        
+                SignUpClient.send({
+                    
+                    name:name,
+                    email:email,
+                    password:password,
+                    passwordConfirm:passwordConfirm
+                    
+                },function(data){
+                    
+                    console.log(data);
+                    
+                },function(){
+                    
+                    self.showError("Failed to signup, please try after.");
+                    
+                })
+                
 				
 			});
 			
@@ -85,6 +108,7 @@ var SignUpView = Backbone.View.extend({
 		var passwordConfirm = $('#form-signup input[name="password-confirm"]').val();
 		
 		var err = {
+		    general : '',
 			name : '',
 			email : '',
 			password : ''

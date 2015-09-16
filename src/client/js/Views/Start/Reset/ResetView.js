@@ -6,9 +6,10 @@ var Utils = require('../../../lib/utils');
 var Const = require('../../../lib/consts');
 var Config = require('../../../lib/init');
 
-var ResetView = Backbone.View.extend({
+var BaseView = require('../BaseView');
 
-    container: null,
+var ResetView = BaseView.extend({
+
     initialize: function(options) {
         
         this.container = options.container;

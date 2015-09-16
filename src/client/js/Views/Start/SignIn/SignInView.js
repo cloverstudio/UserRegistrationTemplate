@@ -6,9 +6,10 @@ var Utils = require('../../../lib/utils');
 var Const = require('../../../lib/consts');
 var Config = require('../../../lib/init');
 
-var SignInView = Backbone.View.extend({
+var BaseView = require('../BaseView');
 
-    container: null,
+var SignInView = BaseView.extend({
+
     initialize: function(options) {
         
         this.container = options.container;

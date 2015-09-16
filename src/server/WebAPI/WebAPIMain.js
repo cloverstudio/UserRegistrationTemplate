@@ -1,7 +1,7 @@
 var bodyParser = require("body-parser");
 var _ = require('lodash');
 
-var init = require('../init.js');
+var init = require('../lib/init.js');
 
 var WebAPIMain ={
     
@@ -11,6 +11,8 @@ var WebAPIMain ={
         
         app.use(init.urlPrefix,express.static(__dirname + '/../../../public'));
         app.use(bodyParser.json());
+        
+        require('./SignUp').attach(app,express);
                 
     }
 }
