@@ -9,6 +9,7 @@
 
     Const.httpCodeSucceed = 200;
     Const.httpCodeFileNotFound = 404;
+    Const.httpCodeServerError = 500;
 
     // Exports ----------------------------------------------
     module["exports"] = Const;

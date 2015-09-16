@@ -9,13 +9,26 @@ var _ = require('lodash');
         container: null,
         showError : function(err){
             
-            $(this.container + " .alert").show();
-            $(this.container + " .alert .detail").text(err);
+            $(this.container + " .alert-danger").hide();
+            $(this.container + " .alert-info").hide();
+            
+            $(this.container + " .alert-danger").show();
+            $(this.container + " .alert-danger .detail").text(err);
+            
+        },
+        showInfo : function(err){
+            
+            $(this.container + " .alert-danger").hide();
+            $(this.container + " .alert-info").hide();
+            
+            $(this.container + " .alert-info").show();
+            $(this.container + " .alert-info .detail").text(err);
             
         },
         dismissAlerts : function(){
             
-            $(this.container + " .alert").hide();
+            $(this.container + " .alert-danger").hide();
+            $(this.container + " .alert-info").hide();
             
         }
     });

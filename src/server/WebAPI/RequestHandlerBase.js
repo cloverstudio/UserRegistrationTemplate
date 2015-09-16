@@ -25,6 +25,7 @@ RequestHandlerBase.prototype.errorResponse = function(
         retry){
 
     response.status(httpCode);
+    
     response.json({
         success : Const.responsecodeError,
         error : {

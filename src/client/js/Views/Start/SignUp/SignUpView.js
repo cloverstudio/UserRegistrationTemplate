@@ -72,12 +72,20 @@ var SignUpView = BaseView.extend({
                     passwordConfirm:passwordConfirm
                     
                 },function(data){
+                                        
+                    if(!_.isEmpty(data.result.validationError)){
+                        
+                        self.showError(Utils.l10n(data.result.validationError));
+                        
+                    }else{
+                        // succeeeeeeeed!!!!!
+                        self.showInfo(Utils.l10n("Succeed to signup. Please login now."));
+                    }
                     
-                    console.log(data);
                     
                 },function(){
                     
-                    self.showError("Failed to signup, please try after.");
+                    self.showError(Utils.l10n("Failed to signup, please try after."));
                     
                 })
                 

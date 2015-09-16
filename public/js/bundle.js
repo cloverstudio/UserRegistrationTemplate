@@ -31106,13 +31106,26 @@ var _ = require('lodash');
         container: null,
         showError : function(err){
             
-            $(this.container + " .alert").show();
-            $(this.container + " .alert .detail").text(err);
+            $(this.container + " .alert-danger").hide();
+            $(this.container + " .alert-info").hide();
+            
+            $(this.container + " .alert-danger").show();
+            $(this.container + " .alert-danger .detail").text(err);
+            
+        },
+        showInfo : function(err){
+            
+            $(this.container + " .alert-danger").hide();
+            $(this.container + " .alert-info").hide();
+            
+            $(this.container + " .alert-info").show();
+            $(this.container + " .alert-info .detail").text(err);
             
         },
         dismissAlerts : function(){
             
-            $(this.container + " .alert").hide();
+            $(this.container + " .alert-danger").hide();
+            $(this.container + " .alert-info").hide();
             
         }
     });
@@ -31251,7 +31264,7 @@ module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":f
     + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"Sign Up",{"name":"l10n","hash":{},"data":data}))
     + "</h2>\n\n        <div class=\"alert alert-danger alert-dismissible\" role=\"alert\" style=\"display:none\">\n          <strong>"
     + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"Error",{"name":"l10n","hash":{},"data":data}))
-    + "</strong> \n          <span class=\"detail\"></span>\n        </div>\n        \n        <div class=\"form-group username\">\n            <div class=\"form-label\">\n                <span class=\"glyphicon glyphicon-chevron-right\" aria-hidden=\"true\"></span> "
+    + "</strong> \n          <span class=\"detail\"></span>\n        </div>\n        \n        <div class=\"alert alert-info alert-dismissible\" role=\"alert\" style=\"display:none\">\n          <span class=\"detail\"></span>\n        </div>\n        \n        <div class=\"form-group username\">\n            <div class=\"form-label\">\n                <span class=\"glyphicon glyphicon-chevron-right\" aria-hidden=\"true\"></span> "
     + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"User Name",{"name":"l10n","hash":{},"data":data}))
     + "\n            </div>\n            <input type=\"text\" name=\"username\" class=\"form-control\">\n			<span class=\"help-block\"></span>\n        </div>\n        \n        <div class=\"form-group email\">\n            <div class=\"form-label\">\n                <span class=\"glyphicon glyphicon-chevron-right\" aria-hidden=\"true\"></span> "
     + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"Email Address",{"name":"l10n","hash":{},"data":data}))
@@ -31339,12 +31352,20 @@ var SignUpView = BaseView.extend({
                     passwordConfirm:passwordConfirm
                     
                 },function(data){
+                                        
+                    if(!_.isEmpty(data.result.validationError)){
+                        
+                        self.showError(Utils.l10n(data.result.validationError));
+                        
+                    }else{
+                        // succeeeeeeeed!!!!!
+                        self.showInfo(Utils.l10n("Succeed to signup. Please login now."));
+                    }
                     
-                    console.log(data);
                     
                 },function(){
                     
-                    self.showError("Failed to signup, please try after.");
+                    self.showError(Utils.l10n("Failed to signup, please try after."));
                     
                 })
                 
