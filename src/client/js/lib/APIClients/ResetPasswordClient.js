@@ -12,7 +12,7 @@ var _ = require('lodash');
     
     ResetPasswordClient.prototype.send = function(data,success,err){
         
-        this.postRequst("/resetpassword",data,success,err);
+        this.postRequst("/user/signup",data,success,err);
         
     }
         

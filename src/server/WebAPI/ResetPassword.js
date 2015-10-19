@@ -1,3 +1,6 @@
+var express = require('express');
+var router = express.Router();
+
 var bodyParser = require("body-parser");
 var _ = require('lodash');
 var async = require('async');
@@ -8,16 +11,16 @@ var Const = require("../lib/consts");
 var Utils = require('../lib/utils');
 
 
-var SignInHandler = function(){}
+var ResetPasswordHandler = function(){}
 var UserModel = require('../Models/User');
 
-_.extend(SignInHandler.prototype,RequestHandlerBase.prototype);
+_.extend(ResetPasswordHandler.prototype,RequestHandlerBase.prototype);
 
-SignInHandler.prototype.attach = function(app,express){
+ResetPasswordHandler.prototype.attach = function(router){
         
     var self = this;
 
-    app.post(this.path('/resetpassword'),function(request,response){
+    router.post('/',function(request,response){
             
         var userModel = UserModel.get();
         var email = request.body.email;
@@ -62,4 +65,5 @@ SignInHandler.prototype.attach = function(app,express){
 
 }
 
-module["exports"] = new SignInHandler();
+new ResetPasswordHandler().attach(router);
+module["exports"] = router;

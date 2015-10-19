@@ -1,3 +1,6 @@
+var express = require('express');
+var router = express.Router();
+
 var bodyParser = require("body-parser");
 var _ = require('lodash');
 var async = require('async');
@@ -12,11 +15,11 @@ var UserModel = require('../Models/User');
 
 _.extend(SignInHandler.prototype,RequestHandlerBase.prototype);
 
-SignInHandler.prototype.attach = function(app,express){
+SignInHandler.prototype.attach = function(router){
         
     var self = this;
 
-    app.post(this.path('/signin'),function(request,response){
+    router.post('/',function(request,response){
             
         var userModel = UserModel.get();
             
@@ -45,7 +48,9 @@ SignInHandler.prototype.attach = function(app,express){
         });
         
     });
+    
 
 }
 
-module["exports"] = new SignInHandler();
+new SignInHandler().attach(router);
+module["exports"] = router;

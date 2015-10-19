@@ -10,7 +10,9 @@
     Const.httpCodeSucceed = 200;
     Const.httpCodeFileNotFound = 404;
     Const.httpCodeServerError = 500;
-
+    
+    Const.credentialsMinLength = 6;
+    
     // Exports ----------------------------------------------
     module["exports"] = Const;
 

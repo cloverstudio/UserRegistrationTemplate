@@ -8968,7 +8968,7 @@ var _logger = require('./logger');
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var VERSION = '4.0.2';
+var VERSION = '4.0.3';
 exports.VERSION = VERSION;
 var COMPILER_REVISION = 7;
 
@@ -9271,12 +9271,6 @@ exports['default'] = function (instance) {
     }
 
     function execIteration(field, index, last) {
-      // Don't iterate over undefined values since we can't execute blocks against them
-      // in non-strict (js) mode.
-      if (context[field] == null) {
-        return;
-      }
-
       if (data) {
         data.key = field;
         data.index = index;
@@ -9297,7 +9291,9 @@ exports['default'] = function (instance) {
     if (context && typeof context === 'object') {
       if (_utils.isArray(context)) {
         for (var j = context.length; i < j; i++) {
-          execIteration(i, i, i === context.length - 1);
+          if (i in context) {
+            execIteration(i, i, i === context.length - 1);
+          }
         }
       } else {
         var priorKey = undefined;
@@ -9470,6 +9466,9 @@ module.exports = exports['default'];
 'use strict';
 
 exports.__esModule = true;
+
+var _utils = require('./utils');
+
 var logger = {
   methodMap: ['debug', 'info', 'warn', 'error'],
   level: 'info',
@@ -9477,7 +9476,7 @@ var logger = {
   // Maps a given level value to the `methodMap` indexes above.
   lookupLevel: function lookupLevel(level) {
     if (typeof level === 'string') {
-      var levelMap = logger.methodMap.indexOf(level.toLowerCase());
+      var levelMap = _utils.indexOf(logger.methodMap, level.toLowerCase());
       if (levelMap >= 0) {
         level = levelMap;
       } else {
@@ -9512,7 +9511,7 @@ exports['default'] = logger;
 module.exports = exports['default'];
 
 
-},{}],22:[function(require,module,exports){
+},{"./utils":25}],22:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};/* global window */
 'use strict';
 
@@ -9786,6 +9785,7 @@ function invokePartial(partial, context, options) {
 
   var partialBlock = undefined;
   if (options.fn && options.fn !== noop) {
+    options.data = _base.createFrame(options.data);
     partialBlock = options.data['partial-block'] = options.fn;
 
     if (partialBlock.partials) {
@@ -32936,7 +32936,7 @@ var Buffer=require("__browserify_Buffer").Buffer;(function() {
 
     'use strict';
 
-    validator = { version: '4.0.5' };
+    validator = { version: '4.1.0' };
 
     var emailUserPart = /^[a-z\d!#\$%&'\*\+\-\/=\?\^_`{\|}~]+$/i;
     var quotedEmailUser = /^([\s\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e]|(\\[\x01-\x09\x0b\x0c\x0d-\x7f]))*$/i;
@@ -32983,6 +32983,7 @@ var Buffer=require("__browserify_Buffer").Buffer;(function() {
 
     var phones = {
       'zh-CN': /^(\+?0?86\-?)?1[345789]\d{9}$/,
+      'zh-TW': /^(\+?886\-?|0)?9\d{8}$/,
       'en-ZA': /^(\+?27|0)\d{9}$/,
       'en-AU': /^(\+?61|0)4\d{8}$/,
       'en-HK': /^(\+?852\-?)?[569]\d{3}\-?\d{4}$/,
@@ -33370,7 +33371,34 @@ var Buffer=require("__browserify_Buffer").Buffer;(function() {
     };
 
     validator.isDate = function (str) {
-        return !isNaN(Date.parse(str));
+        var normalizedDate = new Date((new Date(str)).toUTCString());
+        var regularDay = String(normalizedDate.getDate());
+        var utcDay = String(normalizedDate.getUTCDate());
+        var dayOrYear, dayOrYearMatches, year;
+        if (isNaN(Date.parse(normalizedDate))) {
+            return false;
+        }
+        //check for valid double digits that could be late days
+        //check for all matches since a string like '12/23' is a valid date
+        //ignore everything with nearby colons
+        dayOrYearMatches = str.match(/(^|[^:\d])[23]\d([^:\d]|$)/g);
+        if (!dayOrYearMatches) {
+            return true;
+        }
+        dayOrYear = dayOrYearMatches.map(function(digitString) {
+            return digitString.match(/\d+/g)[0];
+        }).join('/');
+        year = String(normalizedDate.getFullYear()).slice(-2);
+        //local date and UTC date can differ, but both are valid, so check agains both
+        if (dayOrYear === regularDay || dayOrYear === utcDay || dayOrYear === year) {
+            return true;
+        } else if ((dayOrYear === (regularDay + '/' + year)) || (dayOrYear === (year + '/' + regularDay))) {
+            return true;
+        } else if ((dayOrYear === (utcDay + '/' + year)) || (dayOrYear === (year + '/' + utcDay))) {
+            return true;
+        } else {
+            return false;
+        }
     };
 
     validator.isAfter = function (str, date) {
@@ -33382,7 +33410,7 @@ var Buffer=require("__browserify_Buffer").Buffer;(function() {
     validator.isBefore = function (str, date) {
         var comparison = validator.toDate(date || new Date())
           , original = validator.toDate(str);
-        return original && comparison && original < comparison;
+        return !!(original && comparison && original < comparison);
     };
 
     validator.isIn = function (str, options) {
@@ -33735,16 +33763,16 @@ var _ = require('lodash');
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    var alias1=helpers.helperMissing, alias2=container.escapeExpression;
+    var alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3=container.escapeExpression;
 
   return "    \n    <form class=\"form\" id=\"form-reset\">\n    \n        <h2 class=\"form-reset-heading\">"
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"Reset Password",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"Reset Password",{"name":"l10n","hash":{},"data":data}))
     + "</h2>\n\n        <div class=\"alert alert-danger alert-dismissible\" role=\"alert\" style=\"display:none\">\n          <strong>"
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"Error",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"Error",{"name":"l10n","hash":{},"data":data}))
     + "</strong> \n          <span class=\"detail\"></span>\n        </div>\n        \n        <div class=\"alert alert-info alert-dismissible\" role=\"alert\" style=\"display:none\">\n          <span class=\"detail\"></span>\n        </div>\n\n        <div class=\"form-group email\">\n            <div class=\"form-label\">\n                <span class=\"glyphicon glyphicon-chevron-right\" aria-hidden=\"true\"></span> "
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"Email Address",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"Email Address",{"name":"l10n","hash":{},"data":data}))
     + "\n            </div>\n            <input type=\"text\" name=\"email\" class=\"form-control\">\n			<span class=\"help-block\"></span>\n        </div>\n        \n        <div class=\"spacer\">\n    \n        </div>\n        \n        <div class=\"btn btn-lg btn-primary btn-block\" id=\"btn-reset\">"
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"Reset",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"Reset",{"name":"l10n","hash":{},"data":data}))
     + "</div>\n        \n    </form>\n    \n";
 },"useData":true});
 
@@ -33868,18 +33896,18 @@ module.exports = ResetView;
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    var alias1=helpers.helperMissing, alias2=container.escapeExpression;
+    var alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3=container.escapeExpression;
 
   return "    \n    <form class=\"form\" id=\"form-signin\">\n    \n        <h2 class=\"form-signin-heading\">"
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"Sign In",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"Sign In",{"name":"l10n","hash":{},"data":data}))
     + "</h2>\n\n        <div class=\"alert alert-danger alert-dismissible\" role=\"alert\" style=\"display:none\">\n          <strong>"
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"Error",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"Error",{"name":"l10n","hash":{},"data":data}))
     + "</strong> \n          <span class=\"detail\"></span>\n        </div>\n        \n        <div class=\"alert alert-info alert-dismissible\" role=\"alert\" style=\"display:none\">\n          <span class=\"detail\"></span>\n        </div>\n        \n        <div class=\"form-group username\">\n            <div class=\"form-label\">\n                <span class=\"glyphicon glyphicon-chevron-right\" aria-hidden=\"true\"></span> "
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"User Name",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"User Name",{"name":"l10n","hash":{},"data":data}))
     + "\n            </div>\n            <input type=\"text\" name=\"username\" class=\"form-control\">\n			<span class=\"help-block\"></span>\n        </div>\n        \n        <div class=\"form-group password\">\n            <div class=\"form-label\">\n                <span class=\"glyphicon glyphicon-chevron-right\" aria-hidden=\"true\"></span> "
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"Password",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"Password",{"name":"l10n","hash":{},"data":data}))
     + "\n            </div>\n            <input type=\"password\" name=\"password\" class=\"form-control\">\n			<span class=\"help-block\"></span>\n        </div>\n        \n        <div class=\"spacer\">\n    \n        </div>\n        \n        <div class=\"btn btn-lg btn-primary btn-block\" id=\"btn-signin\">"
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"Sign in",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"Sign in",{"name":"l10n","hash":{},"data":data}))
     + "</div>\n        \n    </form>\n    \n";
 },"useData":true});
 
@@ -34017,22 +34045,22 @@ module.exports = SignInView;
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    var alias1=helpers.helperMissing, alias2=container.escapeExpression;
+    var alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3=container.escapeExpression;
 
   return "    \n    <form class=\"form\" id=\"form-signup\">\n    \n        <h2 class=\"form-signin-heading\">"
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"Sign Up",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"Sign Up",{"name":"l10n","hash":{},"data":data}))
     + "</h2>\n\n        <div class=\"alert alert-danger alert-dismissible\" role=\"alert\" style=\"display:none\">\n          <strong>"
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"Error",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"Error",{"name":"l10n","hash":{},"data":data}))
     + "</strong> \n          <span class=\"detail\"></span>\n        </div>\n        \n        <div class=\"alert alert-info alert-dismissible\" role=\"alert\" style=\"display:none\">\n          <span class=\"detail\"></span>\n        </div>\n        \n        <div class=\"form-group username\">\n            <div class=\"form-label\">\n                <span class=\"glyphicon glyphicon-chevron-right\" aria-hidden=\"true\"></span> "
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"User Name",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"User Name",{"name":"l10n","hash":{},"data":data}))
     + "\n            </div>\n            <input type=\"text\" name=\"username\" class=\"form-control\">\n			<span class=\"help-block\"></span>\n        </div>\n        \n        <div class=\"form-group email\">\n            <div class=\"form-label\">\n                <span class=\"glyphicon glyphicon-chevron-right\" aria-hidden=\"true\"></span> "
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"Email Address",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"Email Address",{"name":"l10n","hash":{},"data":data}))
     + "\n            </div>\n            <input type=\"text\" name=\"email\" class=\"form-control\">\n			<span class=\"help-block\"></span>\n        </div>\n        \n        <div class=\"form-group password\">\n            <div class=\"form-label\">\n                <span class=\"glyphicon glyphicon-chevron-right\" aria-hidden=\"true\"></span> "
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"Password",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"Password",{"name":"l10n","hash":{},"data":data}))
     + "\n            </div>\n            <input type=\"password\" name=\"password\" class=\"form-control\">\n			<span class=\"help-block\"></span>\n		</div>\n        \n        <div class=\"form-group password-confirm\">\n            <div class=\"form-label\">\n                <span class=\"glyphicon glyphicon-chevron-right\" aria-hidden=\"true\"></span> "
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"Confirm Password",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"Confirm Password",{"name":"l10n","hash":{},"data":data}))
     + "\n            </div>\n            <input type=\"password\" name=\"password-confirm\" class=\"form-control\">\n			<span class=\"help-block\"></span>\n		</div>\n        \n        <div class=\"spacer\">\n    \n        </div>\n        \n        <div class=\"btn btn-lg btn-primary btn-block\" id=\"btn-signup\">"
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"Sign Up",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"Sign Up",{"name":"l10n","hash":{},"data":data}))
     + "</div>\n        \n    </form>\n    \n";
 },"useData":true});
 
@@ -34202,14 +34230,14 @@ module.exports = SignUpView;
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    var alias1=helpers.helperMissing, alias2=container.escapeExpression;
+    var alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3=container.escapeExpression;
 
   return "    <div id=\"start-view\" class=\"container\">\n\n        <div class=\"row\">\n        \n          <div class=\"col-md-3 col-xs-1 col-sm-1\"></div>\n\n          \n          <div class=\"col-md-6 col-xs-10 col-sm-10\">\n  \n              <!-- Nav tabs -->\n              <ul class=\"nav nav-tabs\" role=\"tablist\">\n                <li role=\"presentation\" class=\"active\"><a href=\"#signin\" aria-controls=\"home\" role=\"tab\" data-toggle=\"tab\">"
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"SignIn",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"SignIn",{"name":"l10n","hash":{},"data":data}))
     + "</a></li>\n                <li role=\"presentation\"><a href=\"#signup\" aria-controls=\"profile\" role=\"tab\" data-toggle=\"tab\">"
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"SignUp",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"SignUp",{"name":"l10n","hash":{},"data":data}))
     + "</a></li>\n                <li role=\"presentation\"><a href=\"#reset\" aria-controls=\"messages\" role=\"tab\" data-toggle=\"tab\">"
-    + alias2((helpers.l10n || (depth0 && depth0.l10n) || alias1).call(depth0,"Reset Password",{"name":"l10n","hash":{},"data":data}))
+    + alias3((helpers.l10n || (depth0 && depth0.l10n) || alias2).call(alias1,"Reset Password",{"name":"l10n","hash":{},"data":data}))
     + "</a></li>\n              </ul>\n            \n              <!-- Tab panes -->\n              <div class=\"tab-content\">\n                <div role=\"tabpanel\" class=\"tab-pane active\" id=\"signin\"></div>\n                <div role=\"tabpanel\" class=\"tab-pane\" id=\"signup\"></div>\n                <div role=\"tabpanel\" class=\"tab-pane\" id=\"reset\"></div>\n              </div>\n        \n          </div>\n          \n          <div class=\"col-md-3 col-xs-1 col-sm-1\"></div>\n          \n        </div>\n\n    \n    </div>\n    \n";
 },"useData":true});
 
@@ -34333,7 +34361,7 @@ var _ = require('lodash');
     
     ResetPasswordClient.prototype.send = function(data,success,err){
         
-        this.postRequst("/resetpassword",data,success,err);
+        this.postRequst("/user/signup",data,success,err);
         
     }
         
@@ -34356,7 +34384,7 @@ var _ = require('lodash');
     
     SignInClient.prototype.send = function(data,success,err){
         
-        this.postRequst("/signin",data,success,err);
+        this.postRequst("/user/signup",data,success,err);
         
     }
         
@@ -34379,7 +34407,7 @@ var _ = require('lodash');
     
     SignUpClient.prototype.send = function(data,success,err){
         
-        this.postRequst("/signup",data,success,err);
+        this.postRequst("/user/signup",data,success,err);
         
     }
         
@@ -34404,7 +34432,7 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
     "use strict;"
 
     var Config = {
-        APIEndpoint : 'http://localhost:8080/user/api/v1',
+        APIEndpoint : 'http://localhost:8080/api/v1',
         defaultContaier : 'body' // write JQuery style selector
     };
 

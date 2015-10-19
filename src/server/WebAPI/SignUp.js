@@ -1,3 +1,6 @@
+var express = require('express');
+var router = express.Router();
+var validator = require('validator');
 var bodyParser = require("body-parser");
 var _ = require('lodash');
 var async = require('async');
@@ -13,11 +16,11 @@ var UserModel = require('../Models/User');
 
 _.extend(SignUpHandler.prototype,RequestHandlerBase.prototype);
 
-SignUpHandler.prototype.attach = function(app,express){
+SignUpHandler.prototype.attach = function(router){
         
     var self = this;
 
-    app.post(this.path('/signup'),function(request,response){
+    router.post('/',function(request,response){
                 
         var username = request.body.username;
         var email = request.body.email;
@@ -79,7 +82,39 @@ SignUpHandler.prototype.validate = function(requestBody,callBack){
 	
     async.waterfall([
 
+		
         function (done) {
+
+            if(_.isEmpty(requestBody.username))
+            	done("Wrong username");
+            	
+            else if(!validator.isAlphanumeric(requestBody.username)){
+            	done("Wrong username");
+            	
+            } else if(!validator.isLength(requestBody.username,Const.credentialsMinLength)){
+            	done("Wrong username");
+            	
+            } else if(!validator.isEmail(requestBody.email)){
+            	done("Wrong email");
+
+            } else if(!validator.isEmail(requestBody.email)){
+            	done("Wrong email");
+
+            } else if(!validator.isAlphanumeric(requestBody.password)){
+            	done("Wrong password");
+            	
+            } else if(!validator.isLength(requestBody.password,Const.credentialsMinLength)){
+            	done("Wrong password");
+            
+            } else if(requestBody.password != requestBody.passwordConfirm){
+            	done("Wrong password");
+            
+            }
+            done(null,null);
+            
+        },
+
+        function (result,done) {
         
         	userModel.model.findOne({ username: requestBody.username },function (err, user) {
                 
@@ -118,5 +153,5 @@ SignUpHandler.prototype.validate = function(requestBody,callBack){
 
 }
 
-
-module["exports"] = new SignUpHandler();
+new SignUpHandler().attach(router);
+module["exports"] = router;

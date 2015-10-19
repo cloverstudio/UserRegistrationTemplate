@@ -1,3 +1,6 @@
+var express = require('express');
+var router = express.Router();
+
 var bodyParser = require("body-parser");
 var _ = require('lodash');
 
@@ -5,16 +8,19 @@ var init = require('../lib/init.js');
 
 var WebAPIMain ={
     
-    init: function(app,express){
+    init: function(app){
                 
         var self = this;
         
-        app.use(init.urlPrefix,express.static(__dirname + '/../../../public'));
+        app.use('/',express.static(__dirname + '/../../../public'));
         app.use(bodyParser.json());
         
-        require('./SignUp').attach(app,express);
-        require('./SignIn').attach(app,express);
-        require('./ResetPassword').attach(app,express);
+        router.use("/user/signin", require('./SignIn'));
+        router.use("/user/signup", require('./SignUp'));
+        router.use("/user/resetpassword", require('./ResetPassword'));
+        router.use("/test", require('./Test'));
+        
+        app.use(init.urlPrefix, router);
                 
     }
 }

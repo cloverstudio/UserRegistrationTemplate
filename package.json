@@ -20,7 +20,7 @@
     "lodash": "latest",
     "mongoose": "^4.0.6",
     "sha1": "^1.1.1",
-    "validator": "^4.0.5"
+    "validator": "^4.1.0"
   },
   "devDependencies": {
     "browserify": "^2.3.0",
@@ -31,7 +31,9 @@
     "gulp-sass": "latest",
     "gulp-util": "latest",
     "vinyl-source-stream": "latest",
-    "watchify": "latest"
+    "watchify": "latest",
+    "should": "^7.1.0",
+    "supertest": "^1.1.0"
   },
   "scripts": {
     "build-js": "browserify src/client/js/main.js > public/js/bundle.js -d",

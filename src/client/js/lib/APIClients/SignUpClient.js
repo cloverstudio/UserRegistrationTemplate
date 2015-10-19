@@ -12,7 +12,7 @@ var _ = require('lodash');
     
     SignUpClient.prototype.send = function(data,success,err){
         
-        this.postRequst("/signup",data,success,err);
+        this.postRequst("/user/signup",data,success,err);
         
     }
         

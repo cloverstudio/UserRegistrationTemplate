@@ -2,7 +2,7 @@
     "use strict;"
 
     var Config = {
-        APIEndpoint : 'http://localhost:8080/user/api/v1',
+        APIEndpoint : 'http://localhost:8080/api/v1',
         defaultContaier : 'body' // write JQuery style selector
     };
 

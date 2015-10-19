@@ -10,6 +10,13 @@ var port = Conf.port;
 var WebAPI = require('./WebAPI/WebAPIMain');
 var DatabaseManager = require('./lib/DatabaseManager');
 
+Conf.host = "localhost";
+Conf.port = 8081;
+Conf.urlPrefix = '/api/v1';
+
+Conf.dbCollectionPrefix = '';
+Conf.databaseUrl = "mongodb://localhost/test";
+    
 DatabaseManager.init(function(success){
         
     if(!success){
@@ -28,3 +35,5 @@ DatabaseManager.init(function(success){
     }
     
 });
+
+module.exports = app;
