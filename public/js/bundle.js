@@ -34361,7 +34361,7 @@ var _ = require('lodash');
     
     ResetPasswordClient.prototype.send = function(data,success,err){
         
-        this.postRequst("/user/signup",data,success,err);
+        this.postRequst("/user/resetpassword",data,success,err);
         
     }
         
@@ -34384,7 +34384,7 @@ var _ = require('lodash');
     
     SignInClient.prototype.send = function(data,success,err){
         
-        this.postRequst("/user/signup",data,success,err);
+        this.postRequst("/user/signin",data,success,err);
         
     }
         

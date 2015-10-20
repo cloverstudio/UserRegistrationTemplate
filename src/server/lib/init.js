@@ -11,6 +11,12 @@
     Config.dbCollectionPrefix = '';
     Config.databaseUrl = "mongodb://localhost/user";
 
+    
+    Config.emailService = 'Gmail';
+    Config.emailFrom = '';
+    Config.emailUserName = '';
+    Config.emailPassword = '';
+    
     // Exports ----------------------------------------------
     module["exports"] = Config;
 

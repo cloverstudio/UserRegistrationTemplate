@@ -12,6 +12,7 @@
     Const.httpCodeServerError = 500;
     
     Const.credentialsMinLength = 6;
+
     
     // Exports ----------------------------------------------
     module["exports"] = Const;

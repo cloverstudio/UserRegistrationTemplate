@@ -25,9 +25,13 @@ ResetPasswordHandler.prototype.attach = function(router){
         var userModel = UserModel.get();
         var email = request.body.email;
         
+        console.log(email);
+        
     	userModel.model.findOne({ 
     	    email: email
         },function (err, user) {
+            
+            console.log(user);
             
             if(_.isNull(user)){
             
@@ -37,7 +41,7 @@ ResetPasswordHandler.prototype.attach = function(router){
                 
                 return;
             }
-
+            
             var sha1 = require('sha1');
 
             var newPassword = Utils.getRandomString(6);
@@ -51,7 +55,9 @@ ResetPasswordHandler.prototype.attach = function(router){
                     self.errorResponse(response,Const.httpCodeServerError);  
                     return;
                 }
-            
+                
+                Utils.sendEmail(email,"New Password","Your new password is " + newPassword + ".");
+                
                 self.successResponse(response,{
                     ok: true
                 });

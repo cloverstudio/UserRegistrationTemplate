@@ -8,7 +8,6 @@ var UserModel = function(){};
 
 var DatabaseManager = require('../lib/DatabaseManager');
 
-
 _.extend(UserModel.prototype,BaseModel.prototype);
 
 UserModel.prototype.init = function(mongoose){

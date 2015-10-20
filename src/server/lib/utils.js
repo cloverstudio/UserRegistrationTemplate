@@ -1,3 +1,6 @@
+var nodemailer = require('nodemailer');
+var init = require('../lib/init');
+
 (function(global) {
     "use strict;"
 
@@ -8,6 +11,7 @@
     // Header -----------------------------------------------
     Utils.prototype.getRandomString = getRandomString;
     Utils.prototype.now = now;
+    Utils.prototype.sendEmail = sendEmail;
     
     // Implementation ---------------------------------------
     function getRandomString(){
@@ -28,6 +32,31 @@
         
     }
 
+    function now(){
+        Date.now = Date.now || function() { return +new Date; }; 
+        
+        return Date.now();
+        
+    }
+    
+    function sendEmail(to,subject,body){
+        
+        var transporter = nodemailer.createTransport({
+            service: init.emailService,
+            auth: {
+                user: init.emailUserName,
+                pass: init.emailPassword
+            }
+        });
+        transporter.sendMail({
+            from: init.emailFrom,
+            to: to,
+            subject: subject,
+            text: body
+        });
+        
+    }
+    
     // Exports ----------------------------------------------
     module["exports"] = new Utils();
 
